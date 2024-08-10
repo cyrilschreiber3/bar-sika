@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrôleur de Son</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        :root {
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --text-color: #000000;
+            --secondary-text-color: #6e6e73;
+            --button-bg: #007aff;
+            --button-text: #ffffff;
+            --toggle-bg: #34c759;
+            --toggle-bg-off: #e9e9ea;
+            --border-color: #d1d1d6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #000000;
+                --card-bg: #1c1c1e;
+                --text-color: #ffffff;
+                --secondary-text-color: #98989d;
+                --button-bg: #0a84ff;
+                --button-text: #ffffff;
+                --toggle-bg: #30d158;
+                --toggle-bg-off: #39393d;
+                --border-color: #38383a;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--text-color);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sound-control,
+        .general-control {
+            margin-bottom: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .status {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: 500;
+            color: var(--secondary-text-color);
+        }
+
+        .repeat-mode {
+            margin-top: 16px;
+        }
+
+        /* iOS-style toggle switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 32px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--toggle-bg-off);
+            transition: .4s;
+            border-radius: 32px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 28px;
+            width: 28px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--toggle-bg);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
+        /* iOS-style radio buttons */
+        .radio-container {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            user-select: none;
+            color: var(--text-color);
+        }
+
+        .radio-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 22px;
+            width: 22px;
+            background-color: var(--toggle-bg-off);
+            border-radius: 50%;
+        }
+
+        .radio-container:hover input~.checkmark {
+            opacity: 0.8;
+        }
+
+        .radio-container input:checked~.checkmark {
+            background-color: var(--button-bg);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .radio-container input:checked~.checkmark:after {
+            display: block;
+        }
+
+        .radio-container .checkmark:after {
+            top: 7px;
+            left: 7px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Contrôleur de Sirènes</h1>
+    <div class="container">
+        <div class="card">
+            <h2>Sirènes</h2>
+            {% for sound in sounds %}
+            <div class="sound-control">
+                <button id="{{ sound.id }}-button" onclick="toggleSound('{{ sound.id }}')">{{ sound.name }}</button>
+                <span id="{{ sound.id }}-status" class="status">Arrêté</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="card">
+            <h2>Contrôles Généraux</h2>
+            <div class="general-control">
+                <label class="switch">
+                    <input type="checkbox" id="lock-button" onclick="toggleButtonsLock()">
+                    <span class="slider"></span>
+                </label>
+                <span>Verrouiller les boutons</span>
+            </div>
+            <div class="general-control repeat-mode">
+                <h3>Mode de répétition:</h3>
+                <label class="radio-container">Infini
+                    <input type="radio" name="repeat_mode" id="repeat_infinity" value="-1" checked>
+                    <span class="checkmark"></span>
+                </label>
+                <label class="radio-container">Répéter 1 fois
+                    <input type="radio" name="repeat_mode" id="repeat_1" value="1">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="radio-container">Répéter 3 fois
+                    <input type="radio" name="repeat_mode" id="repeat_3" value="3">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+
+        function toggleSound(soundId) {
+            const statusElement = document.getElementById(`${soundId}-status`);
+            const repeatModeSelected = document.querySelector('input[name=repeat_mode]:checked');
+            if (statusElement.textContent === 'Arrêté') {
+                socket.emit('play_sound', {sound_id: soundId, loops: parseInt(repeatModeSelected.value)});
+            } else {
+                socket.emit('stop_sound', {sound_id: soundId});
+            }
+        }
+
+        function toggleButtonsLock() {
+            const lockStatusElement = document.getElementById('lock-button');
+            if (lockStatusElement.checked) {
+                socket.emit('disable_buttons');
+            } else {
+                socket.emit('enable_buttons');
+            }
+        }
+
+        socket.on('sound_status', function (data) {
+            const statusElement = document.getElementById(`${data.sound_id}-status`);
+            statusElement.textContent = data.status === 'Playing' ? 'En cours' : 'Arrêté';
+        });
+
+        socket.on('button_lock_status', function (data) {
+            const lockStatusElement = document.getElementById('lock-button');
+            lockStatusElement.checked = data.status === "Disabled";
+        });
+    </script>
+</body>
+
+</html>
