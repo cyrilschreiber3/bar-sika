@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the bar-sika app
+
+[Service]
+Type=simple
+WorkingDirectory=/home/cyril/bar-sika/
+ExecStart=/usr/bin/python3 /home/cyril/bar-sika/main.py
+
+[Install]
+WantedBy=multi-user.target
