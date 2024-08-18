@@ -7,17 +7,25 @@ import sys
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 from pygame import mixer
 import threading
+import RPi.GPIO as GPIO
 from shared_state import shared_state
 from sound_manager import SoundManager
 from app import create_app, socketio
+
+print("Initializing fan control")
+fan_pin = 13  # Change this to the GPIO pin you're using for the fan
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(fan_pin, GPIO.OUT)
+fan_pwm = GPIO.PWM(fan_pin, 100000)  # 100 Hz frequency
+fan_pwm.start(0)
 
 
 print("Loading sounds")
 mixer.init()
 
-sound1 = SoundManager(26, "./audio/exports/sika2.wav")
-sound2 = SoundManager(19, "./audio/exports/sika3.wav")
-sound3 = SoundManager(13, "./audio/exports/sika4.wav")
+sound1 = SoundManager(21, "./audio/exports/sika2.wav")
+sound2 = SoundManager(20, "./audio/exports/sika3.wav")
+sound3 = SoundManager(16, "./audio/exports/sika4.wav")
 
 shared_state.sounds = {"sound1": sound1, "sound2": sound2, "sound3": sound3}
 
@@ -37,6 +45,10 @@ def shutdown(signal, frame):
 
     # Quit Pygame
     mixer.quit()
+
+    # Release fan PWM pin
+    fan_pwm.stop()
+    GPIO.cleanup()
 
     # Stop the Flask app
     socketio.stop()
@@ -75,6 +87,11 @@ signal.signal(signal.SIGINT, shutdown)
 signal.signal(signal.SIGTERM, shutdown)
 
 print("Starting webserver")
-app = create_app(shared_state)
-socketio.start_background_task(lambda: server_started.set())
-socketio.run(app, host="0.0.0.0", port=5000, allow_unsafe_werkzeug=True)
+app = create_app(shared_state, fan_pwm)
+if __name__ == "__main__":
+    try:
+        socketio.start_background_task(lambda: server_started.set())
+        socketio.run(app, host="0.0.0.0", port=5000, allow_unsafe_werkzeug=True)
+    finally:
+        fan_pwm.stop()
+        GPIO.cleanup()

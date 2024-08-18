@@ -4,9 +4,11 @@ from flask_socketio import SocketIO
 socketio = SocketIO()
 
 
-def create_app(shared_state):
+def create_app(shared_state, fan_pwm):
     app = Flask(__name__)
     socketio.init_app(app)
+
+    app.config["FAN_SPEED"] = 0
 
     @app.route("/")
     def index():
@@ -22,6 +24,9 @@ def create_app(shared_state):
         for sound_id, sound in shared_state.sounds.items():
             status = "Playing" if sound.playing else "Stopped"
             socketio.emit("sound_status", {"sound_id": sound_id, "status": status})
+
+        # Send current fan speed
+        socketio.emit("fan_speed", {"speed": app.config["FAN_SPEED"]})
 
     @socketio.on("play_sound")
     def handle_play_sound(data):
@@ -51,5 +56,12 @@ def create_app(shared_state):
         for sound in shared_state.sounds.values():
             sound.button_disable = True
         socketio.emit("button_lock_status", {"status": "Disabled"})
+
+    @socketio.on("set_fan_speed")
+    def handle_set_fan_speed(data):
+        speed = data["speed"]
+        fan_pwm.ChangeDutyCycle(speed)
+        app.config["FAN_SPEED"] = speed
+        socketio.emit("fan_speed", {"speed": speed})
 
     return app
