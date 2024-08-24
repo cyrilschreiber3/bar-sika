@@ -69,7 +69,7 @@ def sync_sound_status():
     global running
     server_started.wait()
     while running:
-        time.sleep(5)
+        time.sleep(3)
         for sound_id, sound in shared_state.sounds.items():
             status = "Playing" if sound.playing else "Stopped"
             socketio.emit("sound_status", {"sound_id": sound_id, "status": status})
