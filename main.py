@@ -87,7 +87,7 @@ signal.signal(signal.SIGINT, shutdown)
 signal.signal(signal.SIGTERM, shutdown)
 
 print("Starting webserver")
-app = create_app(shared_state, fan_pwm)
+app = create_app(shared_state)
 if __name__ == "__main__":
     socketio.start_background_task(lambda: server_started.set())
     socketio.run(app, host="0.0.0.0", port=5000, allow_unsafe_werkzeug=True)
