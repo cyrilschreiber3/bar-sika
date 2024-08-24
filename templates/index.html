@@ -199,40 +199,6 @@
             border-radius: 50%;
             background: white;
         }
-
-        .fan-speed input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 25px;
-            background: var(--toggle-bg-off);
-            outline: none;
-            opacity: 0.7;
-            -webkit-transition: .2s;
-            transition: opacity .2s;
-            border-radius: 12px;
-        }
-
-        .fan-speed input[type="range"]:hover {
-            opacity: 1;
-        }
-
-        .fan-speed input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 25px;
-            height: 25px;
-            background: var(--button-bg);
-            cursor: pointer;
-            border-radius: 50%;
-        }
-
-        .fan-speed input[type="range"]::-moz-range-thumb {
-            width: 25px;
-            height: 25px;
-            background: var(--button-bg);
-            cursor: pointer;
-            border-radius: 50%;
-        }
     </style>
 </head>
 
@@ -273,18 +239,11 @@
                     <span class="checkmark"></span>
                 </label>
             </div>
-            <div class="general-control fan-speed">
-                <h3>Vitesse du ventilateur:</h3>
-                <input type="range" id="fan-speed" min="0" max="100" value="0">
-                <span id="fan-speed-value">0%</span>
-            </div>
         </div>
     </div>
 
     <script>
         const socket = io();
-        const fanSpeedSlider = document.getElementById('fan-speed');
-        const fanSpeedValue = document.getElementById('fan-speed-value');
 
         function toggleSound(soundId) {
             const statusElement = document.getElementById(`${soundId}-status`);
@@ -305,11 +264,6 @@
             }
         }
 
-        fanSpeedSlider.oninput = function () {
-            fanSpeedValue.textContent = this.value + '%';
-            socket.emit('set_fan_speed', {speed: parseInt(this.value)});
-        }
-
         socket.on('sound_status', function (data) {
             const statusElement = document.getElementById(`${data.sound_id}-status`);
             statusElement.textContent = data.status === 'Playing' ? 'En cours' : 'Arrêté';
@@ -318,11 +272,6 @@
         socket.on('button_lock_status', function (data) {
             const lockStatusElement = document.getElementById('lock-button');
             lockStatusElement.checked = data.status === "Disabled";
-        });
-
-        socket.on('fan_speed', function (data) {
-            fanSpeedSlider.value = data.speed;
-            fanSpeedValue.textContent = data.speed + '%';
         });
 
     </script>

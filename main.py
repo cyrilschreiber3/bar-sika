@@ -7,7 +7,6 @@ import sys
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 from pygame import mixer
 import threading
-import RPi.GPIO as GPIO
 from shared_state import shared_state
 from sound_manager import SoundManager
 from app import create_app, socketio
@@ -45,10 +44,6 @@ def shutdown(signal, frame):
 
     # Quit Pygame
     mixer.quit()
-
-    # Release fan PWM pin
-    fan_pwm.stop()
-    GPIO.cleanup()
 
     # Stop the Flask app
     socketio.stop()
@@ -89,9 +84,5 @@ signal.signal(signal.SIGTERM, shutdown)
 print("Starting webserver")
 app = create_app(shared_state, fan_pwm)
 if __name__ == "__main__":
-    try:
-        socketio.start_background_task(lambda: server_started.set())
-        socketio.run(app, host="0.0.0.0", port=5000, allow_unsafe_werkzeug=True)
-    finally:
-        fan_pwm.stop()
-        GPIO.cleanup()
+    socketio.start_background_task(lambda: server_started.set())
+    socketio.run(app, host="0.0.0.0", port=5000, allow_unsafe_werkzeug=True)

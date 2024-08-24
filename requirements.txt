@@ -1,5 +1,4 @@
 pygame
 gpiozero
-RPi.GPIO
 flask
 flask_socketio
