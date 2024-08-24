@@ -20,13 +20,26 @@ fan_pwm.start(0)
 
 
 print("Loading sounds")
+
+# Try to set volume to 100%
+try:
+    os.system("amixer sset Headphone 100%")
+except:
+    pass
+
 mixer.init()
 
-sound1 = SoundManager(21, "./audio/exports/sika2.wav")
-sound2 = SoundManager(20, "./audio/exports/sika3.wav")
-sound3 = SoundManager(16, "./audio/exports/sika4.wav")
+sound1 = SoundManager(21, "./audio/exports/sika2.wav", "Sika 322 1")
+sound2 = SoundManager(20, "./audio/exports/sika3.wav", "Sika 322 2")
+sound3 = SoundManager(26, "./audio/exports/sika4.wav", "Sika USA")
+sound4 = SoundManager(19, "./audio/exports/sika4.wav", "Sika Pneumatiques")
 
-shared_state.sounds = {"sound1": sound1, "sound2": sound2, "sound3": sound3}
+shared_state.sounds = {
+    "sound1": sound1,
+    "sound2": sound2,
+    "sound3": sound3,
+    "sound4": sound4,
+}
 
 
 def shutdown(signal, frame):
