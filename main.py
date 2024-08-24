@@ -11,14 +11,6 @@ from shared_state import shared_state
 from sound_manager import SoundManager
 from app import create_app, socketio
 
-print("Initializing fan control")
-fan_pin = 13  # Change this to the GPIO pin you're using for the fan
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(fan_pin, GPIO.OUT)
-fan_pwm = GPIO.PWM(fan_pin, 100000)  # 100 Hz frequency
-fan_pwm.start(0)
-
-
 print("Loading sounds")
 
 # Try to set volume to 100%
