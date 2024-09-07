@@ -21,15 +21,15 @@ except:
 
 mixer.init()
 
-sound1 = SoundManager(21, "./audio/exports/sika2.wav", "Sika 322 1")
-sound2 = SoundManager(20, "./audio/exports/sika3.wav", "Sika 322 2")
-sound3 = SoundManager(26, "./audio/exports/sika4.wav", "Sika USA")
-sound4 = SoundManager(19, "./audio/exports/sika4.wav", "Sika Pneumatiques")
+sound1 = SoundManager(21, "./audio/exports/sika_322_1.wav", "Sika 322 1")
+sound2 = SoundManager(20, "./audio/exports/sika_322_2.wav", "Sika 322 2")
+# sound3 = SoundManager(26, "./audio/exports/sika4.wav", "Sika USA")
+sound4 = SoundManager(19, "./audio/exports/sika_pneum.wav", "Sika Pneumatiques")
 
 shared_state.sounds = {
     "sound1": sound1,
     "sound2": sound2,
-    "sound3": sound3,
+    # "sound3": sound3,
     "sound4": sound4,
 }
 
