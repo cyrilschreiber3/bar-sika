@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 
@@ -5,7 +6,11 @@ socketio = SocketIO()
 
 
 def create_app(shared_state):
-    app = Flask(__name__)
+    # Get data directory from environment variable (set by wrapper) or use project root for development
+    data_dir = os.environ.get('BAR_SIKA_DATA_DIR', os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
+    template_dir = os.path.join(data_dir, 'templates')
+    app = Flask(__name__, template_folder=template_dir)
+    # app = Flask(__name__)
     socketio.init_app(app)
 
     @app.route("/")

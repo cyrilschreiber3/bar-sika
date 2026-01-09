@@ -1,4 +1,0 @@
-pygame
-gpiozero
-flask
-flask_socketio

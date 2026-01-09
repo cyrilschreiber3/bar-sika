@@ -1,2 +1,4 @@
 __pycache__
 audio/sika_audition/Backup/*
+.venv/
+/result
