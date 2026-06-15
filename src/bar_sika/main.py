@@ -64,7 +64,7 @@ def main():
     mixer.init()
 
     sound1 = SoundManager(21, "./audio/sika_322_1.wav", "Sika 322 1")
-    sound2 = SoundManager(20, "./audio/sika_322_2.wav", "Sika 322 2")
+    sound2 = SoundManager(20, "./audio/sika_322_2-v2.wav", "Sika 322 2")
     # sound3 = SoundManager(26, "./audio/sika4.wav", "Sika USA")
     sound4 = SoundManager(19, "./audio/sika_pneum.wav", "Sika Pneumatiques")
 
