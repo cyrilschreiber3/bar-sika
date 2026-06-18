@@ -9,7 +9,8 @@ def create_app(shared_state):
     # Get data directory from environment variable (set by wrapper) or use project root for development
     data_dir = os.environ.get('BAR_SIKA_DATA_DIR', os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
     template_dir = os.path.join(data_dir, 'templates')
-    app = Flask(__name__, template_folder=template_dir)
+    static_dir = os.path.join(data_dir, 'static')
+    app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
     # app = Flask(__name__)
     socketio.init_app(app)
 

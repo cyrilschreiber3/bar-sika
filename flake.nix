@@ -124,6 +124,7 @@
 
               # Copy templates and audio files
               cp -r templates $out/share/${thisProjectAsNixPkg.pname}/
+              cp -r src/bar_sika/static $out/share/${thisProjectAsNixPkg.pname}/
               mkdir -p $out/share/${thisProjectAsNixPkg.pname}/audio
               cp audio/exports/*.wav $out/share/${thisProjectAsNixPkg.pname}/audio/
 
